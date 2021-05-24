@@ -3,23 +3,23 @@ import configparser
 import numpy as np
 import random
 import gym
-import gym_flock
+# import gym_flock
 import torch
 import gym_swarm
 import sys
-
-from learner.gnn_cloning import train_cloning
-from learner.gnn_dagger import train_dagger
-from learner.gnn_baseline import train_baseline
-
-
-def run_experiment(args):
+import PIL.Image
+# from learner.gnn_cloning import train_cloning
+# from learner.gnn_dagger import train_dagger
+# from learner.gnn_baseline import train_baseline
+# from learner.gnn_baseline import train_baseline
+from learner.gnn_swarm import train_swarm
+def run_experiment(args, labels):
     # initialize gym env
     env_name = args.get('env')
     env = gym.make(env_name)
-    
-    if isinstance(env.env, gym_flock.envs.FlockingRelativeEnv):
-        env.env.params_from_cfg(args)
+
+    # if isinstance(env.env, gym_swarm.envs.SwarmEnv):
+    env.params_from_cfg(args)
 
     # use seed
     seed = args.getint('seed')
@@ -32,12 +32,8 @@ def run_experiment(args):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     alg = args.get('alg').lower()
-    if alg == 'dagger':
-        stats = train_dagger(env, args, device)
-    elif alg == 'cloning':
-        stats = train_cloning(env, args, device)
-    elif alg == 'baseline':
-        stats = train_baseline(env, args)
+    if alg == 'swarm':
+        stats = train_swarm(env, args, device, labels)
     else:
         raise Exception('Invalid algorithm/mode name')
     return stats
@@ -48,7 +44,17 @@ def main():
     config_file = path.join(path.dirname(__file__), fname)
     config = configparser.ConfigParser()
     config.read(config_file)
+    fname   = 'pic1.png'
+    # max_size = 40
+    # ref_img = PIL.Image.open(fname)
+    # ref_img.thumbnail((max_size, max_size), PIL.Image.ANTIALIAS)
+    # ref_img = 1.0-np.float32(ref_img)
 
+    # # number_of_robots = int(ref_img.sum())
+    # ref_img = torch.tensor(ref_img)
+    # ref_array = torch.nonzero(ref_img).float()
+    # ref_array = torch.swapaxes(ref_array,0,1)
+    ref_array = torch.zeros([2, 100], dtype=torch.float32)
     printed_header = False
 
     if config.sections():
@@ -57,10 +63,10 @@ def main():
                 print(config[section_name].get('header'))
                 printed_header = True
 
-            stats = run_experiment(config[section_name])
+            stats = run_experiment(config[section_name], ref_array)
             print(section_name + ", " + str(stats['mean']) + ", " + str(stats['std']))
     else:
-        val = run_experiment(config[config.default_section])
+        val = run_experiment(config[config.default_section], ref_img)
         print(val)
 
 

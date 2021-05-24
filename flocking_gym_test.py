@@ -1,7 +1,7 @@
 import gym
 import gym_flock
 import configparser
-
+from PIL import Image
 
 env_name = "FlockingTwoFlocks-v0"
 config_file = 'cfg/n_twoflocks.cfg'
@@ -20,6 +20,7 @@ config = configparser.ConfigParser()
 config.read(config_file)
 env.env.params_from_cfg(config[config.sections()[0]])
 
+i = 0
 while True:
     state = env.reset()
     episode_reward = 0
@@ -27,10 +28,11 @@ while True:
     while not done:
         action = env.env.controller(False)
         next_state, reward, done, _ = env.step(action)
+        print(next_state)
         episode_reward += reward
         state = next_state
-        env.render()
-
-    print(episode_reward)
+        # env.render()
+    break
+    # print(episode_reward)
 
 env.close()

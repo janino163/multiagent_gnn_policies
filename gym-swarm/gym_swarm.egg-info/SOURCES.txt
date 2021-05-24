@@ -1,0 +1,7 @@
+README.md
+setup.py
+gym_swarm.egg-info/PKG-INFO
+gym_swarm.egg-info/SOURCES.txt
+gym_swarm.egg-info/dependency_links.txt
+gym_swarm.egg-info/requires.txt
+gym_swarm.egg-info/top_level.txt

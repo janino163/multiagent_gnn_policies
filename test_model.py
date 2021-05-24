@@ -8,15 +8,16 @@ import torch
 import sys
 
 from learner.state_with_delay import MultiAgentStateWithDelay
-from learner.gnn_dagger import DAGGER
+# from learner.gnn_dagger import DAGGER
+from learner.swarm_dagger import SWARM
 
 
-def test(args, actor_path, render=True):
+def test(args, actor_path, render=False):
     # initialize gym env
     env_name = args.get('env')
     env = gym.make(env_name)
-    if isinstance(env.env, gym_flock.envs.FlockingRelativeEnv):
-        env.env.params_from_cfg(args)
+    # if isinstance(env.env, gym_flock.envs.flocking.FlockingRelativeEnv):
+    env.env.params_from_cfg(args)
 
     # use seed
     seed = args.getint('seed')
@@ -27,7 +28,7 @@ def test(args, actor_path, render=True):
 
     # initialize params tuple
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    learner = DAGGER(device, args)
+    learner = SWARM(device, args)
     n_test_episodes = args.getint('n_test_episodes')
     learner.load_model(actor_path, device)
 
@@ -41,9 +42,10 @@ def test(args, actor_path, render=True):
             next_state = MultiAgentStateWithDelay(device, args, next_state, prev_state=state)
             episode_reward += reward
             state = next_state
+            print(action)
             if render:
                 env.render()
-        print(episode_reward)
+        # print(episode_reward)
     env.close()
 
 
@@ -54,8 +56,8 @@ def main():
     config.read(config_file)
 
     printed_header = False
-    actor_path = 'models/actor_FlockingRelative-v0_dagger_k3'
-
+    # actor_path = 'models/actor_FlockingRelative-v0_dagger_k3'
+    actor_path ='models/actor_swarm-v0_swarm_gridk3'
     if config.sections():
         for section_name in config.sections():
             if not printed_header:

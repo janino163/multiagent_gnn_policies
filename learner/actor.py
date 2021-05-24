@@ -81,6 +81,6 @@ class Actor(nn.Module):
 
         x = x.view((batch_size, 1, self.n_a, n_agents))  # now size (B, 1, nA, N)
 
-        # x = x.clamp(-10, 10)  # TODO these limits depend on the MDP
+        x = x.clamp(-3, 3)  # TODO these limits depend on the MDP
 
         return x
